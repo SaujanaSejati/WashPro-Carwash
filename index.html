@@ -91,11 +91,11 @@ let servicePackages=[
 {id:"PKG-2",name:"Cuci Premium",description:"Cucian luaran dan pembersihan dalaman",price:20,duration:30,emoji:"✨",active:true},
 {id:"PKG-3",name:"Detailing",description:"Pakej penjagaan lebih menyeluruh",price:45,duration:60,emoji:"🚘",active:true}
 ];
-try{const saved=JSON.parse(localStorage.getItem("washpro_packages")||"null");if(Array.isArray(saved)&&saved.length)servicePackages=saved;}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem("washpro_packages")||"null");if(Array.isArray(saved)&&saved.length)servicePackages=saved.map(p=>({...p,duration:Number(p.duration)||({"PKG-1":30,"PKG-2":30,"PKG-3":60}[p.id]||30)}));}catch(e){}
 function savePackages(){try{localStorage.setItem("washpro_packages",JSON.stringify(servicePackages));}catch(e){alert("Browser tidak dapat menyimpan pakej.");}}
 function renderPackages(){
  const cards=document.getElementById("packageCards");
- cards.innerHTML=servicePackages.map(p=>'<div class="package" style="'+(!p.active?'opacity:.6;':'')+'"><div class="emoji">'+esc(p.emoji||"🚘")+'</div><h4>'+esc(p.name)+'</h4><p class="muted">'+esc(p.description)+'</p><div class="price">'+fmt(p.price)+'</div><p class="muted">'+(p.active?'Aktif':'Tidak aktif')+'</p><div class="actions"><button class="secondary" onclick="showPackageForm(\''+p.id+'\')">Edit</button><button class="secondary" onclick="togglePackage(\''+p.id+'\')">'+(p.active?'Nyahaktif':'Aktifkan')+'</button></div></div>').join("")||'<div class="empty">Belum ada pakej. Tekan “Tambah pakej”.</div>';
+ cards.innerHTML=servicePackages.map(p=>'<div class="package" style="'+(!p.active?'opacity:.6;':'')+'"><div class="emoji">'+esc(p.emoji||"🚘")+'</div><h4>'+esc(p.name)+'</h4><p class="muted">'+esc(p.description)+'</p><div class="price">'+fmt(p.price)+'</div><p class="muted">Tempoh: '+(Number(p.duration)||30)+' minit</p><p class="muted">'+(p.active?'Aktif':'Tidak aktif')+'</p><div class="actions"><button class="secondary" onclick="showPackageForm(\''+p.id+'\')">Edit</button><button class="secondary" onclick="togglePackage(\''+p.id+'\')">'+(p.active?'Nyahaktif':'Aktifkan')+'</button></div></div>').join("")||'<div class="empty">Belum ada pakej. Tekan “Tambah pakej”.</div>';
  const sel=document.getElementById("service"),prev=sel.value;
  sel.innerHTML=servicePackages.filter(p=>p.active).map(p=>'<option value="'+esc(p.id)+'">'+esc(p.name)+' — '+fmt(p.price)+'</option>').join("");
  if(servicePackages.some(p=>p.id===prev&&p.active))sel.value=prev;
