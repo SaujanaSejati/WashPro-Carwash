@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07111f">
+<title>Tempahan Customer | WashPro Carwash</title>
+<style>
+:root{--bg:#07111f;--panel:#101e30;--panel2:#15263a;--line:#253951;--text:#edf5ff;--muted:#91a7c0;--blue:#45a3ff;--green:#42d6a0;--amber:#ffc66d}
+*{box-sizing:border-box}body{margin:0;background:linear-gradient(140deg,#07111f,#0b1929 60%,#10233a);color:var(--text);font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.wrap{max-width:980px;margin:auto;padding:20px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}.brand{display:flex;align-items:center;gap:12px}.logo{width:45px;height:45px;border-radius:14px;background:linear-gradient(135deg,#43b2ff,#41e0b0);display:grid;place-items:center;color:#07111f;font-size:23px;font-weight:900}.brand h1{margin:0;font-size:22px}.brand p{margin:0;color:var(--muted);font-size:12px}.pill{border-radius:99px;padding:7px 10px;background:#342918;color:var(--amber);font-size:12px;font-weight:800}.notice,.panel,.pkg{border:1px solid var(--line);background:rgba(16,30,48,.94);border-radius:17px}.notice{padding:13px 15px;color:#b8d8f7;font-size:12px;margin-bottom:17px}.hero{padding:25px 0 15px}.hero h2{font-size:clamp(27px,5vw,42px);line-height:1.12;margin:0 0 10px}.hero p{color:var(--muted);margin:0}.panel{padding:19px;margin:15px 0}.panel h3{margin:0 0 14px}.packages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.pkg{padding:16px;background:var(--panel2);text-align:left;cursor:pointer;color:var(--text);width:100%;border:1px solid var(--line)}.pkg.selected{border-color:var(--blue);box-shadow:0 0 0 1px var(--blue)}.emoji{font-size:27px}.pkg h4{margin:7px 0 3px}.price{font-size:24px;font-weight:850}.muted{color:var(--muted);font-size:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:5px}.field input,.field select,.field textarea{width:100%;background:#091625;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:12px;font:inherit}.field textarea{min-height:78px;resize:vertical}button.submit{background:var(--blue);color:#061424;border:0;border-radius:11px;padding:13px 17px;font-weight:800;font:inherit;cursor:pointer;width:100%;margin-top:15px}.success{padding:15px;border-radius:12px;background:#12352f;border:1px solid #286c5d;color:#b6ffe7;margin-top:14px}.slotnote{font-size:12px;color:var(--muted);margin-top:6px}footer{text-align:center;color:var(--muted);font-size:11px;padding:20px}@media(max-width:700px){.wrap{padding:13px}.packages{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.panel{padding:14px}}
+</style>
+</head>
+<body><main class="wrap">
+<header class="top"><div class="brand"><div class="logo">W</div><div><h1>WashPro Carwash</h1><p>Tempahan pelanggan</p></div></div><span class="pill">BOOKING CUSTOMER</span></header>
+<section class="hero"><h2>Tempah slot cucian anda.</h2><p>Pilih pakej, tarikh dan masa yang sesuai. Kami akan hubungi anda untuk pengesahan tempahan.</p></section>
+<div class="notice"><b>Pratonton tempahan:</b> Halaman ini masih versi demo. Tempahan disimpan pada browser/peranti yang digunakan sahaja dan belum dihantar ke dashboard admin. Jangan gunakan untuk tempahan pelanggan sebenar sehingga database bersama diaktifkan.</div>
+<section class="panel"><h3>1. Pilih pakej cucian</h3><div class="packages" id="packages"></div></section>
+<section class="panel"><h3>2. Maklumat tempahan</h3><form id="bookingForm"><div class="grid">
+<div class="field"><label>Nama penuh</label><input id="name" required autocomplete="name" placeholder="Nama anda"></div>
+<div class="field"><label>No. telefon</label><input id="phone" type="tel" required autocomplete="tel" placeholder="Contoh: 01X-XXXXXXX"></div>
+<div class="field"><label>No. plat kenderaan</label><input id="plate" required placeholder="Contoh: AXX 1234"></div>
+<div class="field"><label>Jenis kenderaan</label><select id="vehicle"><option>Kereta sedan</option><option>Hatchback</option><option>SUV</option><option>MPV</option><option>Pickup / 4x4</option><option>Motosikal</option><option>Lain-lain</option></select></div>
+<div class="field"><label>Tarikh pilihan</label><input id="date" type="date" required></div>
+<div class="field"><label>Masa pilihan</label><select id="time" required></select><div class="slotnote" id="timeNote">Pilih tarikh untuk melihat masa pilihan.</div></div>
+<div class="field" style="grid-column:1/-1"><label>Catatan (pilihan)</label><textarea id="notes" placeholder="Contoh: ada kerusi bayi / permintaan khas"></textarea></div>
+</div><button class="submit" type="submit">Hantar permintaan tempahan</button><div id="result" aria-live="polite"></div></form></section>
+<footer>WashPro Carwash · Halaman tempahan pelanggan</footer>
+</main>
+<script>
+const defaults=[
+ {id:'basic',name:'Cuci Asas',price:12,emoji:'🫧',description:'Cucian asas luaran',duration:30,active:true},
+ {id:'premium',name:'Cuci Premium',price:20,emoji:'✨',description:'Cucian lebih menyeluruh',duration:30,active:true},
+ {id:'detail',name:'Detailing',price:45,emoji:'🚘',description:'Penjagaan lebih terperinci',duration:60,active:true}
+];
+const read=(key,fallback)=>{try{const v=JSON.parse(localStorage.getItem(key));return v??fallback}catch{return fallback}};
+const settings=read('washpro_settings',{open:'09:00',close:'21:00',bays:2,reminderMinutes:15});
+const packages=read('washpro_packages',defaults).filter(p=>p.active!==false);
+let chosen=packages[0]?.id||'';
+const $=id=>document.getElementById(id);
+const money=n=>'RM '+Number(n||0).toFixed(2);
+function drawPackages(){ $('packages').innerHTML=''; packages.forEach(p=>{const b=document.createElement('button');b.type='button';b.className='pkg'+(p.id===chosen?' selected':'');b.innerHTML='<div class="emoji">'+(p.emoji||'🚿')+'</div><h4></h4><div class="price"></div><p class="muted"></p><p class="muted"></p>';b.querySelector('h4').textContent=p.name;b.querySelector('.price').textContent=money(p.price);b.querySelectorAll('.muted')[0].textContent=p.description||'Pakej cucian';b.querySelectorAll('.muted')[1].textContent=(p.duration||30)+' minit';b.addEventListener('click',()=>{chosen=p.id;drawPackages();fillTimes()});$('packages').appendChild(b)});}
+function minutes(s){const [h,m]=String(s||'09:00').split(':').map(Number);return h*60+m}
+function timeLabel(n){return String(Math.floor(n/60)).padStart(2,'0')+':'+String(n%60).padStart(2,'0')}
+function fillTimes(){const date=$('date').value;const p=packages.find(x=>x.id===chosen);const start=minutes(settings.open||'09:00'),end=minutes(settings.close||'21:00');$('time').innerHTML='';let count=0;for(let t=start;t+(p?.duration||30)<=end;t+=30){const o=document.createElement('option');o.value=timeLabel(t);o.textContent=timeLabel(t);$('time').appendChild(o);count++}if(!count){const o=document.createElement('option');o.value='';o.textContent='Tiada slot tersedia';$('time').appendChild(o)}$('timeNote').textContent='Waktu operasi '+(settings.open||'09:00')+'–'+(settings.close||'21:00')+'. Slot ini ialah masa pilihan sahaja dan belum disahkan oleh admin.';}
+$('date').min=new Date().toLocaleDateString('en-CA');$('date').value=$('date').min;$('date').addEventListener('change',fillTimes);
+$('bookingForm').addEventListener('submit',e=>{e.preventDefault();if(!chosen){alert('Sila pilih pakej dahulu.');return}const p=packages.find(x=>x.id===chosen);const list=read('washpro_customer_bookings',[]);const booking={id:'CUS-'+Date.now().toString().slice(-8),name:$('name').value.trim(),phone:$('phone').value.trim(),plate:$('plate').value.trim().toUpperCase(),vehicle:$('vehicle').value,date:$('date').value,time:$('time').value,packageId:p.id,packageName:p.name,price:p.price,duration:p.duration||30,notes:$('notes').value.trim(),status:'Menunggu pengesahan',createdAt:new Date().toISOString()};list.push(booking);localStorage.setItem('washpro_customer_bookings',JSON.stringify(list));$('result').innerHTML='';const box=document.createElement('div');box.className='success';const strong=document.createElement('b');strong.textContent='Permintaan direkodkan pada peranti ini';box.appendChild(strong);const para=document.createElement('p');para.textContent='Rujukan: '+booking.id+' · '+booking.packageName+' · '+booking.date+' jam '+booking.time+' · '+money(booking.price)+'. Ini belum dihantar ke admin. Sila hubungi pihak carwash untuk pengesahan.';box.appendChild(para);$('result').appendChild(box);});
+drawPackages();fillTimes();
+</script>
+</body></html>
