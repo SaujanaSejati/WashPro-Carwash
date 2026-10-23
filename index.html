@@ -32,6 +32,8 @@
 </main></div><footer>WashPro MVP Preview · Dibina untuk demonstrasi · Belum disambungkan ke database</footer></div>
 <script>
 document.addEventListener("click",function(e){const nav=e.target.closest(".nav");if(nav){e.preventDefault();const id=nav.dataset.page;document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!==id));document.querySelectorAll(".nav").forEach(x=>x.classList.toggle("active",x.dataset.page===id));window.scrollTo(0,0)}},true);
+</script>
+<script>
 let orders=[
 {id:"WP-018",customer:"Amir",plate:"AKD 2145",service:"Cuci Premium",price:20,status:"Sedang dicuci",pay:"QR Pay",date:"2026-10-23",workers:"Ali, Abu",commission:4},
 {id:"WP-017",customer:"Siti",plate:"VBG 8092",service:"Cuci Asas",price:12,status:"Menunggu",pay:"Tunai",date:"2026-10-23",workers:"Ali",commission:2},
