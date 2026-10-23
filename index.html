@@ -13,8 +13,9 @@
 <body><div class="app">
 <header class="top"><div class="brand"><div class="logo">W</div><div><h1>WashPro</h1><p>Sistem Pengurusan Carwash</p></div></div><span class="demo">● DEMO INTERAKTIF · DATA CONTOH</span></header>
 <div class="notice">Ini pratonton untuk cuba paparan dan fungsi asas sahaja. Data adalah contoh dan tidak disimpan ke pangkalan data. Jangan masukkan maklumat pelanggan sebenar.</div>
-<div class="layout"><aside class="side"><small>MENU UTAMA</small><button class="nav active" data-page="dashboard">▦　Dashboard</button><button class="nav" data-page="orders">☷　Pesanan</button><button class="nav" data-page="new">＋　Pesanan baharu</button><button class="nav" data-page="packages">◇　Pakej servis</button><button class="nav" data-page="workers">♙　Status pekerja</button><button class="nav" data-page="records">▤　Rekod bulanan/tahunan</button><button class="nav" data-page="commission">💰　Komisen staf</button><button class="nav" data-page="employees">♙　Daftar pekerja</button><button class="nav" data-page="payroll">▤　Gaji & slip gaji</button></aside>
+<div class="layout"><aside class="side"><small>MENU UTAMA</small><button class="nav active" data-page="dashboard">▦　Dashboard</button><button class="nav" data-page="orders">☷　Pesanan</button><button class="nav" data-page="new">＋　Pesanan baharu</button><button class="nav" data-page="packages">◇　Pakej servis</button><button class="nav" data-page="workers">♙　Status pekerja</button><button class="nav" data-page="records">▤　Rekod bulanan/tahunan</button><button class="nav" data-page="commission">💰　Komisen staf</button><button class="nav" data-page="employees">♙　Daftar pekerja</button><button class="nav" data-page="payroll">▤　Gaji & slip gaji</button><button class="nav" data-page="settings">⚙　Tetapan Sistem</button></aside>
 <main class="main">
+<section id="settings" class="page hidden"><div class="heading"><div><h2>Tetapan Sistem</h2><p>Ubah operasi WashPro tanpa menyunting kod.</p></div></div><div class="panel"><form id="settingsForm"><div class="formgrid"><div class="field"><label>Waktu buka</label><input id="settingOpen" type="time" value="09:00" required></div><div class="field"><label>Waktu tutup</label><input id="settingClose" type="time" value="21:00" required></div><div class="field"><label>Ruang cucian serentak</label><input id="settingBays" type="number" min="1" max="20" step="1" value="2" required></div><div class="field"><label>Peringatan sebelum giliran (minit)</label><select id="settingReminder"><option value="10">10 minit</option><option value="15" selected>15 minit</option><option value="20">20 minit</option></select></div></div><div class="actions" style="margin-top:16px"><button class="primary" type="submit">Simpan tetapan</button><button class="secondary" type="button" onclick="loadSystemSettings()">Pulihkan tetapan tersimpan</button></div><p class="muted" id="settingsMessage" role="status" style="margin-top:12px">Tetapan disimpan pada browser/peranti ini.</p></form></div><div class="panel"><h3>Perhatian</h3><p class="muted">Tetapan ini digunakan oleh logik slot dalam prototaip admin. Buat masa ini ia disimpan pada browser/peranti ini sahaja; ia belum disegerakkan dengan peranti lain atau laman pelanggan. Nilai peringatan disimpan, tetapi penghantaran SMS/WhatsApp automatik memerlukan backend dan penyedia mesej.</p></div></section>
 <section id="dashboard" class="page"><div class="heading"><div><h2>Dashboard</h2><p>Ringkasan operasi hari ini</p></div><button class="primary" onclick="showPage('new')">＋ Pesanan baharu</button></div>
 <div class="stats"><div class="stat"><span>Jualan hari ini</span><strong id="sales">RM 342</strong><em>↑ Demo hari ini</em></div><div class="stat"><span>Jumlah pesanan</span><strong id="count">18</strong><em>Termasuk contoh</em></div><div class="stat"><span>Sedang dicuci</span><strong id="washing">3</strong><em>Dalam proses</em></div><div class="stat"><span>Menunggu</span><strong id="waiting">2</strong><em>Perlu tindakan</em></div></div>
 <div class="panel"><h3>Pesanan terkini</h3><div class="tablewrap"><table><thead><tr><th>No.</th><th>Pelanggan / Plat</th><th>Pakej</th><th>Harga</th><th>Status</th><th>Tindakan</th></tr></thead><tbody id="recent"></tbody></table></div></div>
@@ -133,7 +134,14 @@ function render(){renderRows("recent",orders.slice(0,4));renderRows("allorders",
 function advance(id){let o=orders.find(x=>x.id===id);if(!o)return;if(o.status==="Menunggu")o.status="Sedang dicuci";else if(o.status==="Sedang dicuci")o.status="Selesai";render()}
 function showPage(id){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!==id));document.querySelectorAll(".nav").forEach(x=>x.classList.toggle("active",x.dataset.page===id));window.scrollTo({top:0,behavior:"smooth"})}
 document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
-const OPEN_MIN=9*60,CLOSE_MIN=21*60,LANES=2;
+let systemSettings={openTime:"09:00",closeTime:"21:00",bays:2,reminderMinutes:15};
+try{const savedSettings=JSON.parse(localStorage.getItem("washpro_settings")||"null");if(savedSettings&&typeof savedSettings==="object")systemSettings={...systemSettings,...savedSettings};}catch(e){}
+function saveSystemSettings(){try{localStorage.setItem("washpro_settings",JSON.stringify(systemSettings));return true;}catch(e){alert("Tetapan tidak dapat disimpan oleh browser ini.");return false;}}
+function loadSystemSettings(){document.getElementById("settingOpen").value=systemSettings.openTime;document.getElementById("settingClose").value=systemSettings.closeTime;document.getElementById("settingBays").value=systemSettings.bays;document.getElementById("settingReminder").value=String(systemSettings.reminderMinutes);const msg=document.getElementById("settingsMessage");if(msg)msg.textContent="Tetapan tersimpan dimuatkan.";}
+function openMinutes(){return mins(systemSettings.openTime)}
+function closeMinutes(){return mins(systemSettings.closeTime)}
+document.getElementById("settingsForm").addEventListener("submit",e=>{e.preventDefault();const open=document.getElementById("settingOpen").value,close=document.getElementById("settingClose").value,bays=Number(document.getElementById("settingBays").value),reminder=Number(document.getElementById("settingReminder").value);if(!open||!close||mins(close)<=mins(open)){alert("Waktu tutup mesti selepas waktu buka.");return}if(!Number.isInteger(bays)||bays<1||bays>20){alert("Bilangan ruang mestilah antara 1 hingga 20.");return}systemSettings={openTime:open,closeTime:close,bays,reminderMinutes:reminder};if(saveSystemSettings()){loadSystemSettings();refreshBookingTimes();document.getElementById("settingsMessage").textContent="Tetapan berjaya disimpan dan digunakan oleh logik slot pada peranti ini.";alert("Tetapan WashPro berjaya disimpan.");}});
+const OPEN_MIN=()=>openMinutes(),CLOSE_MIN=()=>closeMinutes(),LANES=()=>Number(systemSettings.bays)||2;
 function mins(time){const a=String(time||"").split(":").map(Number);return a[0]*60+(a[1]||0)}
 function timeText(n){return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0")}
 function scheduledOrders(date){return orders.filter(o=>o.bookingDate===date&&o.bookingTime&&o.status!=="Dibatalkan")}
@@ -146,14 +154,14 @@ function refreshBookingTimes(){
  date.min=minDate;sel.innerHTML="";
  if(!pkg){note.textContent="Aktifkan atau pilih pakej dahulu.";return}
  let available=0;
- for(let start=OPEN_MIN;start+duration<=CLOSE_MIN;start+=30){
+ for(let start=OPEN_MIN();start+duration<=CLOSE_MIN();start+=30){
    const value=timeText(start),used=countOverlaps(date.value,start,start+duration);
-   const opt=document.createElement("option");opt.value=value;opt.textContent=value+" — "+(used>=LANES?"PENUH":"Boleh ditempah ("+(LANES-used)+" ruang)");
+   const opt=document.createElement("option");opt.value=value;opt.textContent=value+" — "+(used>=LANES()?"PENUH":"Boleh ditempah ("+(LANES()-used)+" ruang)");
    opt.disabled=used>=LANES;sel.appendChild(opt);if(used<LANES)available++;
  }
  if([...sel.options].some(o=>o.value===previous&&!o.disabled))sel.value=previous;
  else {const first=[...sel.options].find(o=>!o.disabled);if(first)sel.value=first.value;}
- note.textContent="Tempoh pakej: "+duration+" minit · Maksimum 2 kereta serentak · "+available+" pilihan masa masih tersedia.";
+ note.textContent="Tempoh pakej: "+duration+" minit · Maksimum "+LANES()+" kereta serentak · "+available+" pilihan masa masih tersedia.";
 }
 document.getElementById("service").addEventListener("change",refreshBookingTimes);
 document.getElementById("bookingDate").addEventListener("change",refreshBookingTimes);
@@ -163,13 +171,13 @@ document.getElementById("orderform").addEventListener("submit",e=>{
  if(!p){alert("Sila tambah atau aktifkan pakej servis dahulu.");showPage("packages");return;}
  const date=document.getElementById("bookingDate").value,time=document.getElementById("bookingTime").value,duration=Math.max(15,Number(p.duration)||30),start=mins(time);
  if(!date||!time){alert("Sila pilih tarikh dan masa tempahan.");return}
- if(start<OPEN_MIN||start+duration>CLOSE_MIN){alert("Masa pakej ini di luar waktu operasi 9 pagi hingga 9 malam.");return}
- if(countOverlaps(date,start,start+duration)>=LANES){refreshBookingTimes();alert("Slot ini sudah penuh. Sila pilih masa lain.");return}
+ if(start<OPEN_MIN()||start+duration>CLOSE_MIN()){alert("Masa pakej ini di luar waktu operasi 9 pagi hingga 9 malam.");return}
+ if(countOverlaps(date,start,start+duration)>=LANES()){refreshBookingTimes();alert("Slot ini sudah penuh. Sila pilih masa lain.");return}
  const price=Number(p.price),service=p.name;
  orders.unshift({id:"WP-"+String(19+orders.length).padStart(3,"0"),date,bookingDate:date,bookingTime:time,duration,customer:document.getElementById("customer").value.trim(),plate:document.getElementById("plate").value.trim().toUpperCase(),service,price,status:"Menunggu",pay:document.getElementById("payment").value,workers:document.getElementById("workersAssigned").value.trim(),commission:Math.max(0,Number(document.getElementById("commissionAmount").value)||0)});
  e.target.reset();render();updateCommissions();refreshBookingTimes();showPage("orders");
 });
 document.getElementById("bookingDate").value=new Date().getFullYear()+"-"+String(new Date().getMonth()+1).padStart(2,"0")+"-"+String(new Date().getDate()).padStart(2,"0");
 
-render();initRecords();updateCommissions();renderPackages();renderEmployees();refreshBookingTimes();
+render();initRecords();updateCommissions();renderPackages();renderEmployees();loadSystemSettings();refreshBookingTimes();
 </script></body></html>
